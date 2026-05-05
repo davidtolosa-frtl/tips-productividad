@@ -1,121 +1,80 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tips, setTips] = useState([
+    { tip: 'Organiza tu dia con una lista de tareas.', votos: 0 },
+    { tip: 'Toma descansos regulares para mantener la concentracion.', votos: 0 },
+    { tip: 'Elimina distracciones mientras trabajas.', votos: 0 },
+    { tip: 'Prioriza tus tareas segun su importancia y urgencia.', votos: 0 },
+  ])
+  const [selected, setSelected] = useState(0)
+
+  const nextRandomTip = () => {
+    const randomIndex = Math.floor(Math.random() * tips.length)
+    let nextIndex = randomIndex
+
+    while (tips.length > 1 && nextIndex === selected) {
+      nextIndex = Math.floor(Math.random() * tips.length)
+    }
+
+    setSelected(nextIndex)
+  }
+
+  const voteCurrentTip = () => {
+    setTips((previousTips) =>
+      previousTips.map((tip, index) =>
+        index === selected ? { ...tip, votos: tip.votos + 1 } : tip,
+      ),
+    )
+  }
+
+  let mostVotedTip = tips[0]
+
+  for (let index = 1; index < tips.length; index += 1) {
+    if (tips[index].votos > mostVotedTip.votos) {
+      mostVotedTip = tips[index]
+    }
+  }
+
+  const hasVotes = mostVotedTip.votos > 0
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className='app'>
+      <header className='app-header'>
+        <h1>💡 Tips de Productividad</h1>
+        <p>Pequenas acciones, grandes resultados</p>
+      </header>
 
-      <div className="ticks"></div>
+      <main className='content'>
+        <section className='tip-card'>
+          <h2>🗓️ Tip actual</h2>
+          <blockquote>{tips[selected].tip}</blockquote>
+          <p className='votes'>⭐ Votos: {tips[selected].votos}</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className='actions'>
+            <button className='btn vote' type='button' onClick={voteCurrentTip}>
+              Me sirvio 👍
+            </button>
+            <button className='btn next' type='button' onClick={nextRandomTip}>
+              Siguiente tip 🎲
+            </button>
+          </div>
+        </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <section className='tip-card top-tip'>
+          <h2>🏆 Tip mas votado</h2>
+          {hasVotes ? (
+            <>
+              <blockquote>{mostVotedTip.tip}</blockquote>
+              <p className='votes best'>⭐ Votos: {mostVotedTip.votos}</p>
+            </>
+          ) : (
+            <p className='empty'>Aun no hay votos.</p>
+          )}
+        </section>
+      </main>
+    </div>
   )
 }
 
